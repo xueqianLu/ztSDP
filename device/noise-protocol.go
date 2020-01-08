@@ -89,6 +89,9 @@ type MessageResponse struct {
 }
 
 type MessageTransport struct {
+	ID       [MessageIDSize]uint8
+	Random   [MessageRandomSize]uint8
+	CheckVal [MessageCheckValSize]uint8
 	Type     uint32
 	Receiver uint32
 	Counter  uint64
