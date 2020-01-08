@@ -2,7 +2,7 @@
 
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2017-2019 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2017-2019 ZtSDP LLC. All Rights Reserved.
  */
 
 package main
@@ -46,18 +46,18 @@ func warning() {
 	fmt.Fprintln(os.Stderr, "W   You are running this software on a Linux kernel,  G")
 	fmt.Fprintln(os.Stderr, "W   which is probably unnecessary and misguided. This G")
 	fmt.Fprintln(os.Stderr, "W   is because the Linux kernel has built-in first    G")
-	fmt.Fprintln(os.Stderr, "W   class support for WireGuard, and this support is  G")
+	fmt.Fprintln(os.Stderr, "W   class support for ZtSDP, and this support is  G")
 	fmt.Fprintln(os.Stderr, "W   much more refined than this slower userspace      G")
 	fmt.Fprintln(os.Stderr, "W   implementation. For more information on           G")
 	fmt.Fprintln(os.Stderr, "W   installing the kernel module, please visit:       G")
-	fmt.Fprintln(os.Stderr, "W           https://www.wireguard.com/install         G")
+	fmt.Fprintln(os.Stderr, "W           https://www.ztSDP.com/install         G")
 	fmt.Fprintln(os.Stderr, "W                                                     G")
 	fmt.Fprintln(os.Stderr, "WARNING WARNING WARNING WARNING WARNING WARNING WARNING")
 }
 
 func main() {
 	if len(os.Args) == 2 && os.Args[1] == "--version" {
-		fmt.Printf("wireguard-go v%s\n\nUserspace WireGuard daemon for %s-%s.\nInformation available at https://www.wireguard.com.\nCopyright (C) Jason A. Donenfeld <Jason@zx2c4.com>.\n", device.WireGuardGoVersion, runtime.GOOS, runtime.GOARCH)
+		fmt.Printf("ztSDP-go v%s\n\nUserspace ZtSDP daemon for %s-%s.\nInformation available at https://www.ztSDP.com.\nCopyright (C) Jason A. Donenfeld <Jason@zx2c4.com>.\n", device.ZtSDPGoVersion, runtime.GOOS, runtime.GOARCH)
 		return
 	}
 
@@ -145,7 +145,7 @@ func main() {
 		fmt.Sprintf("(%s) ", interfaceName),
 	)
 
-	logger.Info.Println("Starting wireguard-go version", device.WireGuardGoVersion)
+	logger.Info.Println("Starting ztSDP-go version", device.ZtSDPGoVersion)
 
 	logger.Debug.Println("Debug log enabled")
 

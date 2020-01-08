@@ -2,7 +2,7 @@
 
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2017-2019 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2017-2019 ZtSDP LLC. All Rights Reserved.
  */
 
 package ipc
@@ -18,7 +18,7 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-var socketDirectory = "/var/run/wireguard"
+var socketDirectory = "/var/run/ztSDP"
 
 const (
 	IpcErrorIO        = -int64(unix.EIO)

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2017-2019 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2017-2019 ZtSDP LLC. All Rights Reserved.
  */
 
 package tun
@@ -314,7 +314,7 @@ func CreateTUN(name string, mtu int) (Device, error) {
 	}
 	defer unix.Close(confd6)
 
-	// Disable link-local v6, not just because WireGuard doesn't do that anyway, but
+	// Disable link-local v6, not just because ZtSDP doesn't do that anyway, but
 	// also because there are serious races with attaching and detaching LLv6 addresses
 	// in relation to interface lifetime within the FreeBSD kernel.
 	var ndireq in6_ndireq

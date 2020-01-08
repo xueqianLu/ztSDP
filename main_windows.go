@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2017-2019 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2017-2019 ZtSDP LLC. All Rights Reserved.
  */
 
 package main
@@ -28,13 +28,13 @@ func main() {
 	}
 	interfaceName := os.Args[1]
 
-	fmt.Fprintln(os.Stderr, "Warning: this is a test program for Windows, mainly used for debugging this Go package. For a real WireGuard for Windows client, the repo you want is <https://git.zx2c4.com/wireguard-windows/>, which includes this code as a module.")
+	fmt.Fprintln(os.Stderr, "Warning: this is a test program for Windows, mainly used for debugging this Go package. For a real ZtSDP for Windows client, the repo you want is <https://git.zx2c4.com/ztSDP-windows/>, which includes this code as a module.")
 
 	logger := device.NewLogger(
 		device.LogLevelDebug,
 		fmt.Sprintf("(%s) ", interfaceName),
 	)
-	logger.Info.Println("Starting wireguard-go version", device.WireGuardGoVersion)
+	logger.Info.Println("Starting ztSDP-go version", device.ZtSDPGoVersion)
 	logger.Debug.Println("Debug log enabled")
 
 	tun, err := tun.CreateTUN(interfaceName)

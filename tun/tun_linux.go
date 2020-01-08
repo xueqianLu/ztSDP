@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2017-2019 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2017-2019 ZtSDP LLC. All Rights Reserved.
  */
 
 package tun
@@ -19,9 +19,9 @@ import (
 	"time"
 	"unsafe"
 
+	"github.com/xueqianLu/ztSDP/rwcancel"
 	"golang.org/x/net/ipv6"
 	"golang.org/x/sys/unix"
-	"github.com/xueqianLu/ztSDP/rwcancel"
 )
 
 const (

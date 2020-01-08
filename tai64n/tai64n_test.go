@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2017-2019 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2017-2019 ZtSDP LLC. All Rights Reserved.
  */
 
 package tai64n
@@ -11,7 +11,7 @@ import (
 )
 
 /* Testing the essential property of the timestamp
- * as used by WireGuard.
+ * as used by ZtSDP.
  */
 func TestMonotonic(t *testing.T) {
 	old := Now()

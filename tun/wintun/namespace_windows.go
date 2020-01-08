@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2019 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2019 ZtSDP LLC. All Rights Reserved.
  */
 
 package wintun
@@ -75,7 +75,7 @@ func (pool Pool) takeNameMutex() (windows.Handle, error) {
 		return 0, err
 	}
 
-	const mutexLabel = "WireGuard Adapter Name Mutex Stable Suffix v1 jason@zx2c4.com"
+	const mutexLabel = "ZtSDP Adapter Name Mutex Stable Suffix v1 jason@zx2c4.com"
 	b2, _ := blake2s.New256(nil)
 	b2.Write([]byte(mutexLabel))
 	b2.Write(norm.NFC.Bytes([]byte(string(pool))))

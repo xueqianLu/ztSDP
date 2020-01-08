@@ -17,16 +17,16 @@
 #                           └──────────────────────────────────┘
 #
 # After the topology is prepared we run a series of TCP/UDP iperf3 tests between the
-# wireguard peers in $ns1 and $ns2. Note that $ns0 is the endpoint for the wg1
-# interfaces in $ns1 and $ns2. See https://www.wireguard.com/netns/ for further
+# ztSDP peers in $ns1 and $ns2. Note that $ns0 is the endpoint for the wg1
+# interfaces in $ns1 and $ns2. See https://www.ztSDP.com/netns/ for further
 # details on how this is accomplished.
 
-# This code is ported to the WireGuard-Go directly from the kernel project.
+# This code is ported to the ZtSDP-Go directly from the kernel project.
 #
-# Please ensure that you have installed the newest version of the WireGuard
-# tools from the WireGuard project and before running these tests as:
+# Please ensure that you have installed the newest version of the ZtSDP
+# tools from the ZtSDP project and before running these tests as:
 #
-# ./netns.sh <path to wireguard-go>
+# ./netns.sh <path to ztSDP-go>
 
 set -e
 
@@ -79,11 +79,11 @@ pp ip netns add $netns1
 pp ip netns add $netns2
 ip0 link set up dev lo
 
-# ip0 link add dev wg1 type wireguard
+# ip0 link add dev wg1 type ztSDP
 n0 $program wg1
 ip0 link set wg1 netns $netns1
 
-# ip0 link add dev wg1 type wireguard
+# ip0 link add dev wg1 type ztSDP
 n0 $program wg2
 ip0 link set wg2 netns $netns2
 
@@ -236,8 +236,8 @@ ip2 link del wg2
 # │  └────────────────┘  └────────────────┘│    │    └────────────────┘    └───────────────────┘ │     │  └────────────────┘ └────────────────┘ │
 # └────────────────────────────────────────┘    └────────────────────────────────────────────────┘     └────────────────────────────────────────┘
 
-# ip1 link add dev wg1 type wireguard
-# ip2 link add dev wg1 type wireguard
+# ip1 link add dev wg1 type ztSDP
+# ip2 link add dev wg1 type ztSDP
 
 n1 $program wg1
 n2 $program wg2
@@ -293,8 +293,8 @@ ip2 link del wg2
 # │  └────────────────┘  └────────────────┘│    │  └────────────────┘ └────────────────┘ │
 # └────────────────────────────────────────┘    └────────────────────────────────────────┘
 
-# ip1 link add dev wg1 type wireguard
-# ip2 link add dev wg1 type wireguard
+# ip1 link add dev wg1 type ztSDP
+# ip2 link add dev wg1 type ztSDP
 n1 $program wg1
 n2 $program wg2
 

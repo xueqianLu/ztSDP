@@ -1,11 +1,11 @@
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2017-2019 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2017-2019 ZtSDP LLC. All Rights Reserved.
  */
 
 package device
 
-/* Create two device instances and simulate full WireGuard interaction
+/* Create two device instances and simulate full ZtSDP interaction
  * without network dependencies
  */
 

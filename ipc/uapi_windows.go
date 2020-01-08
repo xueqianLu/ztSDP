@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2017-2019 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2017-2019 ZtSDP LLC. All Rights Reserved.
  */
 
 package ipc
@@ -64,7 +64,7 @@ func UAPIListen(name string) (net.Listener, error) {
 	config := winpipe.PipeConfig{
 		SecurityDescriptor: UAPISecurityDescriptor,
 	}
-	listener, err := winpipe.ListenPipe(`\\.\pipe\ProtectedPrefix\Administrators\WireGuard\`+name, &config)
+	listener, err := winpipe.ListenPipe(`\\.\pipe\ProtectedPrefix\Administrators\ZtSDP\`+name, &config)
 	if err != nil {
 		return nil, err
 	}

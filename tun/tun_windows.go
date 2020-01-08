@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2018-2019 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2018-2019 ZtSDP LLC. All Rights Reserved.
  */
 
 package tun
@@ -42,7 +42,7 @@ type NativeTun struct {
 	rate      rateJuggler
 }
 
-const WintunPool = wintun.Pool("WireGuard")
+const WintunPool = wintun.Pool("ZtSDP")
 
 //go:linkname procyield runtime.procyield
 func procyield(cycles uint32)

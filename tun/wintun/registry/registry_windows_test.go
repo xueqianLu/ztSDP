@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2019 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2019 ZtSDP LLC. All Rights Reserved.
  */
 
 package registry
@@ -13,7 +13,7 @@ import (
 )
 
 const keyRoot = registry.CURRENT_USER
-const pathRoot = "Software\\WireGuardRegistryTest"
+const pathRoot = "Software\\ZtSDPRegistryTest"
 const path = pathRoot + "\\foobar"
 const pathFake = pathRoot + "\\raboof"
 

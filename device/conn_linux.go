@@ -2,12 +2,12 @@
 
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2017-2019 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2017-2019 ZtSDP LLC. All Rights Reserved.
  *
  * This implements userspace semantics of "sticky sockets", modeled after
- * WireGuard's kernelspace implementation. This is more or less a straight port
+ * ZtSDP's kernelspace implementation. This is more or less a straight port
  * of the sticky-sockets.c example code:
- * https://git.zx2c4.com/WireGuard/tree/contrib/examples/sticky-sockets/sticky-sockets.c
+ * https://git.zx2c4.com/ZtSDP/tree/contrib/examples/sticky-sockets/sticky-sockets.c
  *
  * Currently there is no way to achieve this within the net package:
  * See e.g. https://github.com/golang/go/issues/17930
@@ -24,8 +24,8 @@ import (
 	"syscall"
 	"unsafe"
 
-	"golang.org/x/sys/unix"
 	"github.com/xueqianLu/ztSDP/rwcancel"
+	"golang.org/x/sys/unix"
 )
 
 const (
