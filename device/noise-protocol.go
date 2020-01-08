@@ -10,10 +10,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/xueqianLu/ztSDP/tai64n"
 	"golang.org/x/crypto/blake2s"
 	"golang.org/x/crypto/chacha20poly1305"
 	"golang.org/x/crypto/poly1305"
+	"github.com/xueqianLu/ztSDP/tai64n"
 )
 
 const (
@@ -42,13 +42,13 @@ const (
 	MessageIDSize              = 16
 	MessageRandomSize          = 16
 	MessageCheckValSize        = 16
-	MessageInitiationSize      = 148                                           // size of handshake initation message
+	MessageInitiationSize      = 148                                           // size of handshake initiation message
 	MessageResponseSize        = 92                                            // size of response message
 	MessageCookieReplySize     = 64                                            // size of cookie reply message
-	MessageTransportHeaderSize = 16                                            // size of data preceeding content in transport message
+	MessageTransportHeaderSize = 16                                            // size of data preceding content in transport message
 	MessageTransportSize       = MessageTransportHeaderSize + poly1305.TagSize // size of empty transport
 	MessageKeepaliveSize       = MessageTransportSize                          // size of keepalive
-	MessageHandshakeSize       = MessageInitiationSize                         // size of largest handshake releated message
+	MessageHandshakeSize       = MessageInitiationSize                         // size of largest handshake related message
 )
 
 const (
@@ -62,6 +62,7 @@ const (
  * we can treat these as a 32-bit unsigned int (for now)
  *
  */
+
 type MessageInitiation struct {
 	ID        [MessageIDSize]uint8
 	Random    [MessageRandomSize]uint8
@@ -326,8 +327,13 @@ func (device *Device) ConsumeMessageInitiation(msg *MessageInitiation) *Peer {
 	handshake.chainKey = chainKey
 	handshake.remoteIndex = msg.Sender
 	handshake.remoteEphemeral = msg.Ephemeral
-	handshake.lastTimestamp = timestamp
-	handshake.lastInitiationConsumption = time.Now()
+	if timestamp.After(handshake.lastTimestamp) {
+		handshake.lastTimestamp = timestamp
+	}
+	now := time.Now()
+	if now.After(handshake.lastInitiationConsumption) {
+		handshake.lastInitiationConsumption = now
+	}
 	handshake.state = HandshakeInitiationConsumed
 
 	handshake.mutex.Unlock()

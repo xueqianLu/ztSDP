@@ -24,8 +24,8 @@ import (
 	"syscall"
 	"unsafe"
 
-	"github.com/xueqianLu/ztSDP/rwcancel"
 	"golang.org/x/sys/unix"
+	"github.com/xueqianLu/ztSDP/rwcancel"
 )
 
 const (
@@ -43,6 +43,7 @@ type IPv6Source struct {
 }
 
 type NativeEndpoint struct {
+	sync.Mutex
 	dst  [unsafe.Sizeof(unix.SockaddrInet6{})]byte
 	src  [unsafe.Sizeof(IPv6Source{})]byte
 	isV6 bool
@@ -145,7 +146,7 @@ func CreateBind(port uint16, device *Device) (*nativeBind, uint16, error) {
 
 	go bind.routineRouteListener(device)
 
-	// attempt ipv6 bind, update port if succesful
+	// attempt ipv6 bind, update port if successful
 
 	bind.sock6, newPort, err = create6(port)
 	if err != nil {
@@ -157,7 +158,7 @@ func CreateBind(port uint16, device *Device) (*nativeBind, uint16, error) {
 		port = newPort
 	}
 
-	// attempt ipv4 bind, update port if succesful
+	// attempt ipv4 bind, update port if successful
 
 	bind.sock4, newPort, err = create4(port)
 	if err != nil {
@@ -482,7 +483,9 @@ func send4(sock int, end *NativeEndpoint, buff []byte) error {
 		},
 	}
 
+	end.Lock()
 	_, err := unix.SendmsgN(sock, buff, (*[unsafe.Sizeof(cmsg)]byte)(unsafe.Pointer(&cmsg))[:], end.dst4(), 0)
+	end.Unlock()
 
 	if err == nil {
 		return nil
@@ -493,7 +496,9 @@ func send4(sock int, end *NativeEndpoint, buff []byte) error {
 	if err == unix.EINVAL {
 		end.ClearSrc()
 		cmsg.pktinfo = unix.Inet4Pktinfo{}
+		end.Lock()
 		_, err = unix.SendmsgN(sock, buff, (*[unsafe.Sizeof(cmsg)]byte)(unsafe.Pointer(&cmsg))[:], end.dst4(), 0)
+		end.Unlock()
 	}
 
 	return err
@@ -522,7 +527,9 @@ func send6(sock int, end *NativeEndpoint, buff []byte) error {
 		cmsg.pktinfo.Ifindex = 0
 	}
 
+	end.Lock()
 	_, err := unix.SendmsgN(sock, buff, (*[unsafe.Sizeof(cmsg)]byte)(unsafe.Pointer(&cmsg))[:], end.dst6(), 0)
+	end.Unlock()
 
 	if err == nil {
 		return nil
@@ -533,7 +540,9 @@ func send6(sock int, end *NativeEndpoint, buff []byte) error {
 	if err == unix.EINVAL {
 		end.ClearSrc()
 		cmsg.pktinfo = unix.Inet6Pktinfo{}
+		end.Lock()
 		_, err = unix.SendmsgN(sock, buff, (*[unsafe.Sizeof(cmsg)]byte)(unsafe.Pointer(&cmsg))[:], end.dst6(), 0)
+		end.Unlock()
 	}
 
 	return err
@@ -541,7 +550,7 @@ func send6(sock int, end *NativeEndpoint, buff []byte) error {
 
 func receive4(sock int, buff []byte, end *NativeEndpoint) (int, error) {
 
-	// contruct message header
+	// construct message header
 
 	var cmsg struct {
 		cmsghdr unix.Cmsghdr
@@ -573,7 +582,7 @@ func receive4(sock int, buff []byte, end *NativeEndpoint) (int, error) {
 
 func receive6(sock int, buff []byte, end *NativeEndpoint) (int, error) {
 
-	// contruct message header
+	// construct message header
 
 	var cmsg struct {
 		cmsghdr unix.Cmsghdr

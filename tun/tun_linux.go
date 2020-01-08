@@ -19,9 +19,9 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/xueqianLu/ztSDP/rwcancel"
 	"golang.org/x/net/ipv6"
 	"golang.org/x/sys/unix"
+	"github.com/xueqianLu/ztSDP/rwcancel"
 )
 
 const (
@@ -35,7 +35,7 @@ type NativeTun struct {
 	name                    string     // name of interface
 	errors                  chan error // async error handling
 	events                  chan Event // device related events
-	nopi                    bool       // the device was pased IFF_NO_PI
+	nopi                    bool       // the device was passed IFF_NO_PI
 	netlinkSock             int
 	netlinkCancel           *rwcancel.RWCancel
 	hackListenerClosed      sync.Mutex

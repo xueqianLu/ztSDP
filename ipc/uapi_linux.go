@@ -12,8 +12,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/xueqianLu/ztSDP/rwcancel"
 	"golang.org/x/sys/unix"
+	"github.com/xueqianLu/ztSDP/rwcancel"
 )
 
 var socketDirectory = "/var/run/ztSDP"
