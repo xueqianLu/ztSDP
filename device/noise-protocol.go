@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2017-2019 WireGuard LLC. All Rights Reserved.
+ * Copyright (C) 2017-2019 ZtSDP LLC. All Rights Reserved.
  */
 
 package device
@@ -10,10 +10,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/xueqianLu/ztSDP/tai64n"
 	"golang.org/x/crypto/blake2s"
 	"golang.org/x/crypto/chacha20poly1305"
 	"golang.org/x/crypto/poly1305"
-	"github.com/xueqianLu/ztSDP/tai64n"
 )
 
 const (
@@ -26,7 +26,7 @@ const (
 
 const (
 	NoiseConstruction = "Noise_IKpsk2_25519_ChaChaPoly_BLAKE2s"
-	WGIdentifier      = "WireGuard v1 zx2c4 Jason@zx2c4.com"
+	WGIdentifier      = "ZtSDP v1 zx2c4 Jason@zx2c4.com"
 	WGLabelMAC1       = "mac1----"
 	WGLabelCookie     = "cookie--"
 )
@@ -39,6 +39,9 @@ const (
 )
 
 const (
+	MessageIDSize              = 16
+	MessageRandomSize          = 16
+	MessageCheckValSize        = 16
 	MessageInitiationSize      = 148                                           // size of handshake initation message
 	MessageResponseSize        = 92                                            // size of response message
 	MessageCookieReplySize     = 64                                            // size of cookie reply message
@@ -59,8 +62,10 @@ const (
  * we can treat these as a 32-bit unsigned int (for now)
  *
  */
-
 type MessageInitiation struct {
+	ID        [MessageIDSize]uint8
+	Random    [MessageRandomSize]uint8
+	CheckVal  [MessageCheckValSize]uint8
 	Type      uint32
 	Sender    uint32
 	Ephemeral NoisePublicKey
@@ -71,6 +76,9 @@ type MessageInitiation struct {
 }
 
 type MessageResponse struct {
+	ID        [MessageIDSize]uint8
+	Random    [MessageRandomSize]uint8
+	CheckVal  [MessageCheckValSize]uint8
 	Type      uint32
 	Sender    uint32
 	Receiver  uint32
