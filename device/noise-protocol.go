@@ -7,13 +7,14 @@ package device
 
 import (
 	"errors"
+	"github.com/xueqianLu/ztSDP/auth"
 	"sync"
 	"time"
 
+	"github.com/xueqianLu/ztSDP/tai64n"
 	"golang.org/x/crypto/blake2s"
 	"golang.org/x/crypto/chacha20poly1305"
 	"golang.org/x/crypto/poly1305"
-	"github.com/xueqianLu/ztSDP/tai64n"
 )
 
 const (
@@ -39,16 +40,17 @@ const (
 )
 
 const (
-	MessageIDSize              = 16
-	MessageRandomSize          = 16
-	MessageCheckValSize        = 16
-	MessageInitiationSize      = 148                                           // size of handshake initiation message
-	MessageResponseSize        = 92                                            // size of response message
-	MessageCookieReplySize     = 64                                            // size of cookie reply message
-	MessageTransportHeaderSize = 16                                            // size of data preceding content in transport message
-	MessageTransportSize       = MessageTransportHeaderSize + poly1305.TagSize // size of empty transport
-	MessageKeepaliveSize       = MessageTransportSize                          // size of keepalive
-	MessageHandshakeSize       = MessageInitiationSize                         // size of largest handshake related message
+	MessageIDSize                = 16
+	MessageRandomSize            = 16
+	MessageCheckValSize          = 16
+	MessageInitiationSize        = 196                                                                          // size of handshake initiation message
+	MessageResponseSize          = 140                                                                          // size of response message
+	MessageCookieReplySize       = 64                                                                           // size of cookie reply message
+	MessageTransportHeaderOffSet = 48                                                                           // start offset that transportHeader in MessageTransport
+	MessageTransportHeaderSize   = 16                                                                           // size of data preceding content in transport message
+	MessageTransportSize         = MessageTransportHeaderOffSet + MessageTransportHeaderSize + poly1305.TagSize // size of empty transport
+	MessageKeepaliveSize         = MessageTransportSize                                                         // size of keepalive
+	MessageHandshakeSize         = MessageInitiationSize                                                        // size of largest handshake related message
 )
 
 const (
@@ -199,7 +201,11 @@ func (device *Device) CreateMessageInitiation(peer *Peer) (*MessageInitiation, e
 
 	handshake.mixHash(handshake.remoteStatic[:])
 
+	authData := device.auth.GenerateAuthData(peer.GetId())
 	msg := MessageInitiation{
+		ID:        authData.Id,
+		Random:    authData.Random,
+		CheckVal:  authData.Checkval,
 		Type:      MessageInitiationType,
 		Ephemeral: handshake.localEphemeral.publicKey(),
 		Sender:    handshake.localIndex,
@@ -253,6 +259,11 @@ func (device *Device) ConsumeMessageInitiation(msg *MessageInitiation) *Peer {
 	if msg.Type != MessageInitiationType {
 		return nil
 	}
+	// auth checkval
+	var authData = &auth.AuthData{Id: msg.ID, Random: msg.Random, Checkval: msg.CheckVal}
+	if ok := device.auth.CheckVal(authData); !ok {
+		return nil
+	}
 
 	device.staticIdentity.RLock()
 	defer device.staticIdentity.RUnlock()
@@ -281,6 +292,10 @@ func (device *Device) ConsumeMessageInitiation(msg *MessageInitiation) *Peer {
 
 	peer := device.LookupPeer(peerPK)
 	if peer == nil {
+		return nil
+	}
+	// auth check Id with peer.id
+	if msg.ID != peer.GetId() {
 		return nil
 	}
 
@@ -363,6 +378,12 @@ func (device *Device) CreateMessageResponse(peer *Peer) (*MessageResponse, error
 	}
 
 	var msg MessageResponse
+	// auth add authData
+	authData := device.auth.GenerateAuthData(peer.GetId())
+	msg.ID = authData.Id
+	msg.Random = authData.Random
+	msg.CheckVal = authData.Checkval
+
 	msg.Type = MessageResponseType
 	msg.Sender = handshake.localIndex
 	msg.Receiver = handshake.remoteIndex
@@ -415,9 +436,19 @@ func (device *Device) ConsumeMessageResponse(msg *MessageResponse) *Peer {
 		return nil
 	}
 
+	//auth checkval
+	var authData = &auth.AuthData{Id: msg.ID, Random: msg.Random, Checkval: msg.CheckVal}
+	if ok := device.auth.CheckVal(authData); !ok {
+		return nil
+	}
+
 	// lookup handshake by receiver
 
 	lookup := device.indexTable.Lookup(msg.Receiver)
+	// auth check id with peer.id
+	if msg.ID != lookup.peer.GetId() {
+		return nil
+	}
 	handshake := lookup.handshake
 	if handshake == nil {
 		return nil

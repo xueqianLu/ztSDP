@@ -6,6 +6,7 @@
 package device
 
 import (
+	"github.com/xueqianLu/ztSDP/auth"
 	"runtime"
 	"sync"
 	"sync/atomic"
@@ -89,6 +90,7 @@ type Device struct {
 		device tun.Device
 		mtu    int32
 	}
+	auth *auth.Authorize
 }
 
 /* Converts the peer into a "zombie", which remains in the peer map,
@@ -272,6 +274,7 @@ func NewDevice(tunDevice tun.Device, logger *Logger) *Device {
 	device.isClosed.Set(false)
 
 	device.log = logger
+	device.auth = auth.NewAuthorize()
 
 	device.tun.device = tunDevice
 	mtu, err := device.tun.device.MTU()

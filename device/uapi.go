@@ -237,10 +237,10 @@ func (device *Device) IpcSetOperation(socket *bufio.Reader) *IPCError {
 				} else {
 					peer = device.LookupPeer(publicKey)
 				}
-
+				//Todo: get id from msg.
 				createdNewPeer = peer == nil
 				if createdNewPeer {
-					peer, err = device.NewPeer(publicKey)
+					peer, err = device.NewPeer(publicKey, "idstring")
 					if err != nil {
 						logError.Println("Failed to create new peer:", err)
 						return &IPCError{ipc.IpcErrorInvalid}

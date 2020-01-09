@@ -9,6 +9,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"github.com/xueqianLu/ztSDP/auth"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -19,6 +20,7 @@ const (
 )
 
 type Peer struct {
+	id                          auth.AuthID
 	isRunning                   AtomicBool
 	sync.RWMutex                // Mostly protects endpoint, but is generally taken whenever we modify peer
 	keypairs                    Keypairs
@@ -67,7 +69,7 @@ type Peer struct {
 	cookieGenerator CookieGenerator
 }
 
-func (device *Device) NewPeer(pk NoisePublicKey) (*Peer, error) {
+func (device *Device) NewPeer(pk NoisePublicKey, id string) (*Peer, error) {
 	if device.isClosed.Get() {
 		return nil, errors.New("device closed")
 	}
@@ -92,6 +94,8 @@ func (device *Device) NewPeer(pk NoisePublicKey) (*Peer, error) {
 	peer.Lock()
 	defer peer.Unlock()
 
+	//Todo: id to AuthID
+	peer.id = auth.AuthID{} // get from id.
 	peer.cookieGenerator.Init(pk)
 	peer.device = device
 	peer.isRunning.Set(false)
@@ -298,4 +302,8 @@ func (peer *Peer) SetEndpointFromPacket(endpoint Endpoint) {
 	peer.Lock()
 	peer.endpoint = endpoint
 	peer.Unlock()
+}
+
+func (peer *Peer) GetId() auth.AuthID {
+	return peer.id
 }
