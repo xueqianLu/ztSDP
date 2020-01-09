@@ -263,7 +263,7 @@ func (device *Device) RoutineReadFromTUN() {
 
 		// read packet
 
-		offset := MessageTransportHeaderSize
+		offset := MessageTransportHeaderOffSet + MessageTransportHeaderSize
 		size, err := device.tun.device.Read(elem.buffer[:], offset)
 
 		if err != nil {
@@ -502,11 +502,11 @@ func (device *Device) RoutineEncryption() {
 
 			// populate header fields
 
-			header := elem.buffer[:MessageTransportHeaderSize]
+			header := elem.buffer[:MessageTransportHeaderOffSet+MessageTransportHeaderSize]
 
-			fieldType := header[0:4]
-			fieldReceiver := header[4:8]
-			fieldNonce := header[8:16]
+			fieldType := header[MessageTransportHeaderOffSet+0 : MessageTransportHeaderOffSet+4]
+			fieldReceiver := header[MessageTransportHeaderOffSet+4 : MessageTransportHeaderOffSet+8]
+			fieldNonce := header[MessageTransportHeaderOffSet+8 : MessageTransportHeaderOffSet+16]
 
 			binary.LittleEndian.PutUint32(fieldType, MessageTransportType)
 			binary.LittleEndian.PutUint32(fieldReceiver, elem.keypair.remoteIndex)

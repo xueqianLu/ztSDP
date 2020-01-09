@@ -54,9 +54,9 @@ const (
 )
 
 const (
-	MessageTransportOffsetReceiver = 4
-	MessageTransportOffsetCounter  = 8
-	MessageTransportOffsetContent  = 16
+	MessageTransportOffsetReceiver = MessageTransportHeaderOffSet + 4
+	MessageTransportOffsetCounter  = MessageTransportHeaderOffSet + 8
+	MessageTransportOffsetContent  = MessageTransportHeaderOffSet + 16
 )
 
 /* Type is an 8-bit field, followed by 3 nul bytes,
