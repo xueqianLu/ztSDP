@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"github.com/xueqianLu/ztSDP/auth"
 	"io"
+	"log"
 	"net"
 	"strconv"
 	"strings"
@@ -254,7 +255,8 @@ func (device *Device) IpcSetOperation(socket *bufio.Reader) *IPCError {
 						logDebug.Println(peer, "- UAPI: Created")
 					}
 				}
-			case "ID":
+			case "id":
+				log.Println("SetOpeator ID ", value)
 				if peer != nil {
 					if pid, err := hex.DecodeString(value); (err == nil) && (len(pid) == auth.AuthDataFieldLen) {
 						copy(peer.id[:], pid[:])
