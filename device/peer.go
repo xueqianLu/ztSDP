@@ -69,7 +69,7 @@ type Peer struct {
 	cookieGenerator CookieGenerator
 }
 
-func (device *Device) NewPeer(pk NoisePublicKey, id string) (*Peer, error) {
+func (device *Device) NewPeer(pk NoisePublicKey) (*Peer, error) {
 	if device.isClosed.Get() {
 		return nil, errors.New("device closed")
 	}
@@ -94,8 +94,6 @@ func (device *Device) NewPeer(pk NoisePublicKey, id string) (*Peer, error) {
 	peer.Lock()
 	defer peer.Unlock()
 
-	//Todo: id to AuthID
-	peer.id = auth.AuthID{} // get from id.
 	peer.cookieGenerator.Init(pk)
 	peer.device = device
 	peer.isRunning.Set(false)

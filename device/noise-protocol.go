@@ -295,7 +295,7 @@ func (device *Device) ConsumeMessageInitiation(msg *MessageInitiation) *Peer {
 		return nil
 	}
 	// auth check Id with peer.id
-	if msg.ID != peer.GetId() {
+	if eq := device.auth.CheckId(authData, peer.GetId()); !eq {
 		return nil
 	}
 
@@ -446,9 +446,10 @@ func (device *Device) ConsumeMessageResponse(msg *MessageResponse) *Peer {
 
 	lookup := device.indexTable.Lookup(msg.Receiver)
 	// auth check id with peer.id
-	if msg.ID != lookup.peer.GetId() {
+	if eq := device.auth.CheckId(authData, lookup.peer.GetId()); !eq {
 		return nil
 	}
+
 	handshake := lookup.handshake
 	if handshake == nil {
 		return nil

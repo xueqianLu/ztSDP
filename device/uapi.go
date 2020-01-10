@@ -7,7 +7,9 @@ package device
 
 import (
 	"bufio"
+	"encoding/hex"
 	"fmt"
+	"github.com/xueqianLu/ztSDP/auth"
 	"io"
 	"net"
 	"strconv"
@@ -237,10 +239,10 @@ func (device *Device) IpcSetOperation(socket *bufio.Reader) *IPCError {
 				} else {
 					peer = device.LookupPeer(publicKey)
 				}
-				//Todo: get id from msg.
+
 				createdNewPeer = peer == nil
 				if createdNewPeer {
-					peer, err = device.NewPeer(publicKey, "idstring")
+					peer, err = device.NewPeer(publicKey)
 					if err != nil {
 						logError.Println("Failed to create new peer:", err)
 						return &IPCError{ipc.IpcErrorInvalid}
@@ -251,6 +253,16 @@ func (device *Device) IpcSetOperation(socket *bufio.Reader) *IPCError {
 					} else {
 						logDebug.Println(peer, "- UAPI: Created")
 					}
+				}
+			case "ID":
+				if peer != nil {
+					if pid, err := hex.DecodeString(value); (err == nil) && (len(pid) == auth.AuthDataFieldLen) {
+						copy(peer.id[:], pid[:])
+					} else {
+						logDebug.Println("invalid peerid")
+					}
+				} else {
+					logDebug.Println("peer is nil when set peerid.")
 				}
 
 			case "update_only":

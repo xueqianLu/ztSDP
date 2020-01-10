@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"bytes"
 	"crypto/rand"
 	"io"
 	"sync"
@@ -30,12 +31,34 @@ func (this Authorize) DelId(id AuthID) {
 	this.table.Del(id)
 }
 
-func (this Authorize) CheckId(id AuthID) bool {
+func (this Authorize) ValidId(id AuthID) bool {
 	return this.table.Exist(id)
 }
 
 func (this Authorize) CheckVal(data *AuthData) bool {
-	//Todo:Add checkval
+	var lid AuthID
+	var lcheckVal AuthCheckVal
+	for i := 0; i < AuthDataFieldLen; i++ {
+		lid[i] = data.Id[i] ^ data.Random[i]
+	}
+	for i := 0; i < AuthDataFieldLen; i++ {
+		lcheckVal[i] = (lid[i] ^ iv[i]) ^ data.Random[i]
+	}
+	if result := bytes.Compare(lcheckVal[:], data.Checkval[:]); result != 0 {
+		return false
+	}
+
+	return true
+}
+
+func (this Authorize) CheckId(data *AuthData, pid AuthID) bool {
+	var lid AuthID
+	for i := 0; i < AuthDataFieldLen; i++ {
+		lid[i] = data.Id[i] ^ data.Random[i]
+	}
+	if result := bytes.Compare(lid[:], pid[:]); result != 0 {
+		return false
+	}
 	return true
 }
 
@@ -46,13 +69,18 @@ func (this Authorize) GenerateAuthData(id AuthID) *AuthData {
 		return nil
 	}
 
-	//Todo:Add checkval generate
-	//Todo:Add id generate
 	var random AuthRandom
+	var aid AuthID
+	var checkVal AuthCheckVal
+
 	copy(random[:], val.Bytes()[:AuthDataFieldLen])
+	for i := 0; i < AuthDataFieldLen; i++ {
+		checkVal[i] = (id[i] ^ iv[i]) ^ random[i]
+		aid[i] = id[i] ^ random[i]
+	}
 	return &AuthData{
-		Id:       id,
+		Id:       aid,
 		Random:   random,
-		Checkval: *new(AuthCheckVal),
+		Checkval: checkVal,
 	}
 }
