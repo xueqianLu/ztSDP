@@ -7,7 +7,6 @@ package device
 
 import (
 	"bufio"
-	"encoding/hex"
 	"fmt"
 	"github.com/xueqianLu/ztSDP/auth"
 	"io"
@@ -258,13 +257,13 @@ func (device *Device) IpcSetOperation(socket *bufio.Reader) *IPCError {
 			case "id":
 				log.Println("SetOpeator ID ", value)
 				if peer != nil {
-					if pid, err := hex.DecodeString(value); (err == nil) && (len(pid) == auth.AuthDataFieldLen) {
-						copy(peer.id[:], pid[:])
+					if len(value) == auth.AuthDataFieldLen {
+						copy(peer.id[:], value[:])
 					} else {
-						logDebug.Println("invalid peerid")
+						logError.Println("invalid peerid", value)
 					}
 				} else {
-					logDebug.Println("peer is nil when set peerid.")
+					logError.Println("peer is nil when set peerid.")
 				}
 
 			case "update_only":
