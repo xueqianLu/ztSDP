@@ -136,7 +136,7 @@ func (device *Device) RoutineReceiveIncoming(IP int, bind Bind) {
 		// check size of packet
 
 		packet := buffer[:size]
-		msgType := binary.LittleEndian.Uint32(packet[:4])
+		msgType := binary.LittleEndian.Uint32(packet[MessageTypeOffset:MessageTypeOffset + MessageTypeSize])
 
 		var okay bool
 

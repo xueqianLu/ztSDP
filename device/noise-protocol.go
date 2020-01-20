@@ -57,6 +57,8 @@ const (
 	MessageTransportOffsetReceiver = MessageTransportHeaderOffSet + 4
 	MessageTransportOffsetCounter  = MessageTransportHeaderOffSet + 8
 	MessageTransportOffsetContent  = MessageTransportHeaderOffSet + 16
+	MessageTypeOffset = 48
+	MessageTypeSize = 4
 )
 
 /* Type is an 8-bit field, followed by 3 nul bytes,
@@ -199,9 +201,14 @@ func (device *Device) CreateMessageInitiation(peer *Peer) (*MessageInitiation, e
 		return nil, err
 	}
 
+
+
 	handshake.mixHash(handshake.remoteStatic[:])
 
 	authData := device.auth.GenerateAuthData(peer.GetId())
+	if authData == nil {
+		device.log.Debug.Println(peer, "- authData is nil...", peer)
+	}
 	msg := MessageInitiation{
 		ID:        authData.Id,
 		Random:    authData.Random,
@@ -296,6 +303,7 @@ func (device *Device) ConsumeMessageInitiation(msg *MessageInitiation) *Peer {
 	}
 	// auth check Id with peer.id
 	if eq := device.auth.CheckId(authData, peer.GetId()); !eq {
+		device.log.Debug.Println(peer, "- Initiation auth.CheckId failed...", peer)
 		return nil
 	}
 
@@ -447,6 +455,7 @@ func (device *Device) ConsumeMessageResponse(msg *MessageResponse) *Peer {
 	lookup := device.indexTable.Lookup(msg.Receiver)
 	// auth check id with peer.id
 	if eq := device.auth.CheckId(authData, lookup.peer.GetId()); !eq {
+		device.log.Debug.Println("- response auth.CheckId failed...")
 		return nil
 	}
 

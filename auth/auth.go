@@ -3,7 +3,6 @@ package auth
 import (
 	"bytes"
 	"crypto/rand"
-	"io"
 	"sync"
 )
 
@@ -63,8 +62,7 @@ func (this Authorize) CheckId(data *AuthData, pid AuthID) bool {
 }
 
 func (this Authorize) GenerateAuthData(id AuthID) *AuthData {
-	var reader io.Reader
-	val, err := rand.Prime(reader, 128)
+	val, err := rand.Prime(rand.Reader, 128)
 	if err != nil {
 		return nil
 	}
