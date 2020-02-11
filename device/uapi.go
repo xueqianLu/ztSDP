@@ -87,6 +87,7 @@ func (device *Device) IpcGetOperation(socket *bufio.Writer) *IPCError {
 			send(fmt.Sprintf("tx_bytes=%d", atomic.LoadUint64(&peer.stats.txBytes)))
 			send(fmt.Sprintf("rx_bytes=%d", atomic.LoadUint64(&peer.stats.rxBytes)))
 			send(fmt.Sprintf("persistent_keepalive_interval=%d", peer.persistentKeepaliveInterval))
+			send(fmt.Sprintf("id=%s", string(peer.id[:])))
 
 			for _, ip := range device.allowedips.EntriesForPeer(peer) {
 				send("allowed_ip=" + ip.String())
@@ -255,6 +256,7 @@ func (device *Device) IpcSetOperation(socket *bufio.Reader) *IPCError {
 					}
 				}
 			case "id":
+				logDebug.Println("SetOperator ID", value)
 				log.Println("SetOpeator ID ", value)
 				if peer != nil {
 					if len(value) == auth.AuthDataFieldLen {
