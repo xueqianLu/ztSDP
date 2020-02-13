@@ -27,7 +27,7 @@ const (
 
 const (
 	NoiseConstruction = "Noise_IKpsk2_25519_ChaChaPoly_BLAKE2s"
-	WGIdentifier      = "WireGuard v1 zx2c4 Jason@zx2c4.com"
+	WGIdentifier      = "ZeroTrustNetworkAccesstoAnyone"
 	WGLabelMAC1       = "mac1----"
 	WGLabelCookie     = "cookie--"
 )
@@ -57,8 +57,8 @@ const (
 	MessageTransportOffsetReceiver = MessageTransportHeaderOffSet + 4
 	MessageTransportOffsetCounter  = MessageTransportHeaderOffSet + 8
 	MessageTransportOffsetContent  = MessageTransportHeaderOffSet + 16
-	MessageTypeOffset = 48
-	MessageTypeSize = 4
+	MessageTypeOffset              = 48
+	MessageTypeSize                = 4
 )
 
 /* Type is an 8-bit field, followed by 3 nul bytes,
@@ -201,10 +201,7 @@ func (device *Device) CreateMessageInitiation(peer *Peer) (*MessageInitiation, e
 		return nil, err
 	}
 
-
-
 	handshake.mixHash(handshake.remoteStatic[:])
-
 	authData := device.auth.GenerateAuthData(peer.GetId())
 	if authData == nil {
 		device.log.Debug.Println(peer, "- authData is nil...", peer)
