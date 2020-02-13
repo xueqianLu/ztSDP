@@ -27,7 +27,7 @@ const (
 
 const (
 	NoiseConstruction = "Noise_IKpsk2_25519_ChaChaPoly_BLAKE2s"
-	WGIdentifier      = "ZtSDP v1 zx2c4 Jason@zx2c4.com"
+	WGIdentifier      = "WireGuard v1 zx2c4 Jason@zx2c4.com"
 	WGLabelMAC1       = "mac1----"
 	WGLabelCookie     = "cookie--"
 )
