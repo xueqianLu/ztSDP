@@ -1,15 +1,21 @@
 package auth
 
 const (
-	AuthDataFieldLen = 16
+	AuthRandomLen   = 16
+	AuthCheckValLen = 32
 )
 
-type AuthID [AuthDataFieldLen]byte
-type AuthRandom [AuthDataFieldLen]byte
-type AuthCheckVal [AuthDataFieldLen]byte
+type AuthID [16]byte
+
+type AuthRandom [AuthRandomLen]byte
+type AuthCheckVal [AuthCheckValLen]byte
+
+func (s *AuthCheckVal) SetBytes(data []byte) {
+	copy(s[:], data[:AuthCheckValLen])
+}
 
 type AuthData struct {
-	Id       AuthID
+	AppIdChk AuthCheckVal
+	UsrIdChk AuthCheckVal
 	Random   AuthRandom
-	Checkval AuthCheckVal
 }

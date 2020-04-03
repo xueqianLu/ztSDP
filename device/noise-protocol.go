@@ -40,13 +40,14 @@ const (
 )
 
 const (
-	MessageIDSize                = 16
-	MessageRandomSize            = 16
-	MessageCheckValSize          = 16
-	MessageInitiationSize        = 196                                                                          // size of handshake initiation message
-	MessageResponseSize          = 140                                                                          // size of response message
+	MessageAppidChkSize = 32
+	MessageUsridChkSize = 32
+	MessageRandomSize   = 16
+
+	MessageInitiationSize        = 148 + MessageAppidChkSize + MessageUsridChkSize + MessageRandomSize          // size of handshake initiation message
+	MessageResponseSize          = 92 + MessageAppidChkSize + MessageUsridChkSize + MessageRandomSize           // size of response message
 	MessageCookieReplySize       = 64                                                                           // size of cookie reply message
-	MessageTransportHeaderOffSet = 48                                                                           // start offset that transportHeader in MessageTransport
+	MessageTransportHeaderOffSet = MessageAppidChkSize + MessageUsridChkSize + MessageRandomSize                // start offset that transportHeader in MessageTransport
 	MessageTransportHeaderSize   = 16                                                                           // size of data preceding content in transport message
 	MessageTransportSize         = MessageTransportHeaderOffSet + MessageTransportHeaderSize + poly1305.TagSize // size of empty transport
 	MessageKeepaliveSize         = MessageTransportSize                                                         // size of keepalive
@@ -57,7 +58,7 @@ const (
 	MessageTransportOffsetReceiver = MessageTransportHeaderOffSet + 4
 	MessageTransportOffsetCounter  = MessageTransportHeaderOffSet + 8
 	MessageTransportOffsetContent  = MessageTransportHeaderOffSet + 16
-	MessageTypeOffset              = 48
+	MessageTypeOffset              = MessageAppidChkSize + MessageUsridChkSize + MessageRandomSize
 	MessageTypeSize                = 4
 )
 
@@ -68,9 +69,9 @@ const (
  */
 
 type MessageInitiation struct {
-	ID        [MessageIDSize]uint8
+	AppidChk  [MessageAppidChkSize]uint8
+	UsridChk  [MessageUsridChkSize]uint8
 	Random    [MessageRandomSize]uint8
-	CheckVal  [MessageCheckValSize]uint8
 	Type      uint32
 	Sender    uint32
 	Ephemeral NoisePublicKey
@@ -81,9 +82,9 @@ type MessageInitiation struct {
 }
 
 type MessageResponse struct {
-	ID        [MessageIDSize]uint8
+	AppidChk  [MessageAppidChkSize]uint8
+	UsridChk  [MessageUsridChkSize]uint8
 	Random    [MessageRandomSize]uint8
-	CheckVal  [MessageCheckValSize]uint8
 	Type      uint32
 	Sender    uint32
 	Receiver  uint32
@@ -94,9 +95,9 @@ type MessageResponse struct {
 }
 
 type MessageTransport struct {
-	ID       [MessageIDSize]uint8
+	AppidChk [MessageAppidChkSize]uint8
+	UsridChk [MessageUsridChkSize]uint8
 	Random   [MessageRandomSize]uint8
-	CheckVal [MessageCheckValSize]uint8
 	Type     uint32
 	Receiver uint32
 	Counter  uint64
@@ -207,9 +208,9 @@ func (device *Device) CreateMessageInitiation(peer *Peer) (*MessageInitiation, e
 		device.log.Debug.Println(peer, "- authData is nil...", peer)
 	}
 	msg := MessageInitiation{
-		ID:        authData.Id,
+		AppidChk:  authData.AppIdChk,
+		UsridChk:  authData.UsrIdChk,
 		Random:    authData.Random,
-		CheckVal:  authData.Checkval,
 		Type:      MessageInitiationType,
 		Ephemeral: handshake.localEphemeral.publicKey(),
 		Sender:    handshake.localIndex,
@@ -264,7 +265,7 @@ func (device *Device) ConsumeMessageInitiation(msg *MessageInitiation) *Peer {
 		return nil
 	}
 	// auth checkval
-	var authData = &auth.AuthData{Id: msg.ID, Random: msg.Random, Checkval: msg.CheckVal}
+	var authData = &auth.AuthData{AppIdChk: msg.AppidChk, UsrIdChk: msg.UsridChk, Random: msg.Random}
 	if ok := device.auth.CheckVal(authData); !ok {
 		return nil
 	}
@@ -385,9 +386,9 @@ func (device *Device) CreateMessageResponse(peer *Peer) (*MessageResponse, error
 	var msg MessageResponse
 	// auth add authData
 	authData := device.auth.GenerateAuthData(peer.GetId())
-	msg.ID = authData.Id
+	msg.AppidChk = authData.AppIdChk
+	msg.UsridChk = authData.UsrIdChk
 	msg.Random = authData.Random
-	msg.CheckVal = authData.Checkval
 
 	msg.Type = MessageResponseType
 	msg.Sender = handshake.localIndex
@@ -442,7 +443,8 @@ func (device *Device) ConsumeMessageResponse(msg *MessageResponse) *Peer {
 	}
 
 	//auth checkval
-	var authData = &auth.AuthData{Id: msg.ID, Random: msg.Random, Checkval: msg.CheckVal}
+	var authData = &auth.AuthData{AppIdChk: msg.AppidChk, UsrIdChk: msg.UsridChk, Random: msg.Random}
+	//var authData = &auth.AuthData{Id: msg.ID, Random: msg.Random, Checkval: msg.CheckVal}
 	if ok := device.auth.CheckVal(authData); !ok {
 		return nil
 	}

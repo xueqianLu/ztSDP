@@ -504,9 +504,9 @@ func (device *Device) RoutineEncryption() {
 
 			header := elem.buffer[:MessageTransportHeaderOffSet+MessageTransportHeaderSize]
 			audata := device.auth.GenerateAuthData(elem.peer.GetId())
-			copy(header[:16], audata.Id[:])
-			copy(header[16:32], audata.Random[:])
-			copy(header[32:48], audata.Checkval[:])
+			copy(header[:MessageAppidChkSize], audata.AppIdChk[:])
+			copy(header[MessageAppidChkSize:MessageAppidChkSize+MessageUsridChkSize], audata.UsrIdChk[:])
+			copy(header[MessageAppidChkSize+MessageUsridChkSize:MessageAppidChkSize+MessageUsridChkSize+MessageRandomSize], audata.Random[:])
 
 			fieldType := header[MessageTransportHeaderOffSet+0 : MessageTransportHeaderOffSet+4]
 			fieldReceiver := header[MessageTransportHeaderOffSet+4 : MessageTransportHeaderOffSet+8]
