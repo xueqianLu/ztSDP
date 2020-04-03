@@ -2,10 +2,11 @@ package auth
 
 const (
 	AuthRandomLen   = 16
+	AuthIdLen       = 16
 	AuthCheckValLen = 32
 )
 
-type AuthID [16]byte
+type AuthID [AuthIdLen]byte
 
 type AuthRandom [AuthRandomLen]byte
 type AuthCheckVal [AuthCheckValLen]byte

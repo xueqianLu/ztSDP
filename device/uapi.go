@@ -259,7 +259,7 @@ func (device *Device) IpcSetOperation(socket *bufio.Reader) *IPCError {
 				logDebug.Println("SetOperator ID", value)
 				log.Println("SetOpeator ID ", value)
 				if peer != nil {
-					if len(value) == auth.AuthDataFieldLen {
+					if len(value) == auth.AuthIdLen {
 						copy(peer.id[:], value[:])
 					} else {
 						logError.Println("invalid peerid", value)
