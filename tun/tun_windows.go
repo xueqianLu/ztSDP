@@ -42,7 +42,7 @@ type NativeTun struct {
 	rings     *wintun.RingDescriptor
 }
 
-const WintunPool = wintun.Pool("ZtSDP")
+const WintunPool = wintun.Pool("ZtA")
 
 //go:linkname procyield runtime.procyield
 func procyield(cycles uint32)

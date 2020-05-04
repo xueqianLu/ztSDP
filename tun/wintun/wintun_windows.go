@@ -392,7 +392,7 @@ func (pool Pool) CreateInterface(ifname string, requestedGUID *windows.GUID) (wi
 	// Get network interface.
 	wintun, err = makeWintun(devInfo, devInfoData, pool)
 	if err != nil {
-		err = fmt.Errorf("makeWintun failed: %v", err)
+		err = fmt.Errorf("make zta failed: %v", err)
 		return
 	}
 
@@ -433,7 +433,7 @@ func (pool Pool) CreateInterface(ifname string, requestedGUID *windows.GUID) (wi
 
 	err = wintun.SetName(ifname)
 	if err != nil {
-		err = fmt.Errorf("Unable to set name of Wintun interface: %v", err)
+		err = fmt.Errorf("Unable to set name of zta interface: %v", err)
 		return
 	}
 
@@ -551,7 +551,7 @@ func (pool Pool) DeleteMatchingInterfaces(matches func(wintun *Interface) bool) 
 
 		wintun, err := makeWintun(devInfo, devInfoData, pool)
 		if err != nil {
-			errors = append(errors, fmt.Errorf("Unable to make Wintun interface object: %v", err))
+			errors = append(errors, fmt.Errorf("Unable to make zta interface object: %v", err))
 			continue
 		}
 		if !matches(wintun) {
@@ -625,7 +625,7 @@ func setQuietInstall(devInfo setupapi.DevInfo, devInfoData *setupapi.DevInfoData
 
 // deviceTypeName returns pool-specific device type name.
 func (pool Pool) deviceTypeName() string {
-	return fmt.Sprintf("%s Tunnel", pool)
+	return fmt.Sprintf("%s Secure interface", pool)
 }
 
 // Name returns the name of the Wintun interface.
