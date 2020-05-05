@@ -64,7 +64,7 @@ func UAPIListen(name string) (net.Listener, error) {
 	config := winpipe.PipeConfig{
 		SecurityDescriptor: UAPISecurityDescriptor,
 	}
-	listener, err := winpipe.ListenPipe(`\\.\pipe\ProtectedPrefix\Administrators\ZtSDP\`+name, &config)
+	listener, err := winpipe.ListenPipe(`\\.\pipe\ProtectedPrefix\Administrators\ZtA\`+name, &config)
 	if err != nil {
 		return nil, err
 	}
