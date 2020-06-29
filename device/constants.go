@@ -24,12 +24,13 @@ const (
 	CookieRefreshTime       = time.Second * 120
 	HandshakeInitationRate  = time.Second / 50
 	PaddingMultiple         = 16
+	pubkeylen				= 64
 )
 
 const (
 	MinMessageSize = MessageKeepaliveSize                  // minimum size of transport message (keepalive)
-	MaxMessageSize = MaxSegmentSize                        // maximum size of transport message
-	MaxContentSize = MaxSegmentSize - MessageTransportSize // maximum size of transport message content
+	MaxMessageSize = MaxSegmentSize - pubkeylen            // maximum size of transport message
+	MaxContentSize = MaxSegmentSize - MessageTransportSize - pubkeylen // maximum size of transport message content
 )
 
 /* Implementation constants */

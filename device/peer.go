@@ -150,9 +150,11 @@ func (peer *Peer) SendBuffer(buffer []byte) error {
 		return errors.New("no known endpoint for peer")
 	}
 
-	err := peer.device.net.bind.Send(buffer, peer.endpoint)
+	encpacket := peer.device.auth.EncPacket(buffer)
+
+	err := peer.device.net.bind.Send(encpacket, peer.endpoint)
 	if err == nil {
-		atomic.AddUint64(&peer.stats.txBytes, uint64(len(buffer)))
+		atomic.AddUint64(&peer.stats.txBytes, uint64(len(encpacket)))
 	}
 	return err
 }
