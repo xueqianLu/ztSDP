@@ -72,6 +72,8 @@ func (this Authorize) EncPacket(data []byte) (packet []byte) {
 	packet = make([]byte, Pubkeylen+len(encdata))
 	copy(packet[:Pubkeylen], key[:])
 	copy(packet[Pubkeylen:], encdata[:])
+
+	return packet
 }
 
 func (this Authorize) DecPacket(packet []byte) (data []byte) {
@@ -79,4 +81,5 @@ func (this Authorize) DecPacket(packet []byte) (data []byte) {
 	decdata := SM4Decrypt(key, packet[Pubkeylen:])
 	data = make([]byte, len(decdata))
 	copy(data, decdata)
+	return data
 }
