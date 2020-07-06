@@ -129,18 +129,18 @@ func (device *Device) RoutineReceiveIncoming(IP int, bind Bind) {
 			device.PutMessageBuffer(buffer)
 			return
 		}
-		decpacket := device.auth.DecPacket(packbuf[:size])
-		size = len(decpacket)
-		copy(buffer[:size], decpacket[:])
 
 		if size < MinMessageSize {
 			continue
 		}
+		decpacket := device.auth.DecPacket(packbuf[:size])
+		size = len(decpacket)
+		copy(buffer[:size], decpacket[:])
 
 		// check size of packet
 
 		packet := buffer[:size]
-		msgType := binary.LittleEndian.Uint32(packet[MessageTypeOffset:MessageTypeOffset + MessageTypeSize])
+		msgType := binary.LittleEndian.Uint32(packet[MessageTypeOffset : MessageTypeOffset+MessageTypeSize])
 
 		var okay bool
 

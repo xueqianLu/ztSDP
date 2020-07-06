@@ -8,6 +8,7 @@
 package main
 
 import (
+	"encoding/hex"
 	"fmt"
 	"os"
 	"os/signal"
@@ -60,6 +61,8 @@ func main() {
 		fmt.Printf("ztSDP-go v%s\n\nUserspace ZtSDP daemon for %s-%s.\nInformation available at https://www.ztSDP.com.\nCopyright (C) Jason A. Donenfeld <Jason@zx2c4.com>.\n", device.ZtSDPGoVersion, runtime.GOOS, runtime.GOARCH)
 		return
 	}
+	pubkey := "81903830e01769fe48c372c1c02ce7fefbf042c3fde1f1cb74d3ada4465e26eeacb1f020b347614ab7e2dedb71e2efaa89e2a8661960839f72f6dde95d5eff3f"
+	sm4key, _ := hex.DecodeString(pubkey)
 
 	warning()
 
@@ -225,7 +228,7 @@ func main() {
 		return
 	}
 
-	device := device.NewDevice(tun, logger)
+	device := device.NewDevice(tun, logger, sm4key)
 
 	logger.Info.Println("Device started")
 

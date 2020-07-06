@@ -267,14 +267,14 @@ func (device *Device) SetPrivateKey(sk NoisePrivateKey) error {
 	return nil
 }
 
-func NewDevice(tunDevice tun.Device, logger *Logger) *Device {
+func NewDevice(tunDevice tun.Device, logger *Logger, sm4key []byte) *Device {
 	device := new(Device)
 
 	device.isUp.Set(false)
 	device.isClosed.Set(false)
 
 	device.log = logger
-	device.auth = auth.NewAuthorize()
+	device.auth = auth.NewAuthorizeWithKey(sm4key)
 
 	device.tun.device = tunDevice
 	mtu, err := device.tun.device.MTU()
