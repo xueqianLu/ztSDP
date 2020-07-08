@@ -104,7 +104,6 @@ func (device *Device) RoutineReceiveIncoming(IP int, bind Bind) {
 	// receive datagrams until conn is closed
 
 	buffer := device.GetMessageBuffer()
-	packbuf := make([]byte, MaxSegmentSize)
 
 	var (
 		err      error
@@ -118,9 +117,9 @@ func (device *Device) RoutineReceiveIncoming(IP int, bind Bind) {
 
 		switch IP {
 		case ipv4.Version:
-			size, endpoint, err = bind.ReceiveIPv4(packbuf[:])
+			size, endpoint, err = bind.ReceiveIPv4(buffer[:])
 		case ipv6.Version:
-			size, endpoint, err = bind.ReceiveIPv6(packbuf[:])
+			size, endpoint, err = bind.ReceiveIPv6(buffer[:])
 		default:
 			panic("invalid IP version")
 		}
@@ -133,13 +132,14 @@ func (device *Device) RoutineReceiveIncoming(IP int, bind Bind) {
 		if size < MinMessageSize {
 			continue
 		}
-		decpacket := device.auth.DecPacket(packbuf[:size])
-		size = len(decpacket)
-		copy(buffer[:size], decpacket[:])
+
+		tmp := device.auth.DecPacket(buffer[:size])
+		size = len(tmp)
+		copy(buffer[:size], tmp)
+		packet := buffer[:size]
 
 		// check size of packet
 
-		packet := buffer[:size]
 		msgType := binary.LittleEndian.Uint32(packet[MessageTypeOffset : MessageTypeOffset+MessageTypeSize])
 
 		var okay bool

@@ -40,25 +40,26 @@ const (
 )
 
 const (
+	MessageSMkeySize    = 16
 	MessageAppidChkSize = 32
 	MessageUsridChkSize = 32
 	MessageRandomSize   = 16
 
-	MessageInitiationSize        = 148 + MessageAppidChkSize + MessageUsridChkSize + MessageRandomSize          // size of handshake initiation message
-	MessageResponseSize          = 92 + MessageAppidChkSize + MessageUsridChkSize + MessageRandomSize           // size of response message
-	MessageCookieReplySize       = 64                                                                           // size of cookie reply message
-	MessageTransportHeaderOffSet = MessageAppidChkSize + MessageUsridChkSize + MessageRandomSize                // start offset that transportHeader in MessageTransport
-	MessageTransportHeaderSize   = 16                                                                           // size of data preceding content in transport message
-	MessageTransportSize         = MessageTransportHeaderOffSet + MessageTransportHeaderSize + poly1305.TagSize // size of empty transport
-	MessageKeepaliveSize         = MessageTransportSize                                                         // size of keepalive
-	MessageHandshakeSize         = MessageInitiationSize                                                        // size of largest handshake related message
+	MessageInitiationSize        = 148 + MessageSMkeySize + MessageAppidChkSize + MessageUsridChkSize + MessageRandomSize // size of handshake initiation message
+	MessageResponseSize          = 92 + MessageSMkeySize + MessageAppidChkSize + MessageUsridChkSize + MessageRandomSize  // size of response message
+	MessageCookieReplySize       = 64                                                                                     // size of cookie reply message
+	MessageTransportHeaderOffSet = MessageSMkeySize + MessageAppidChkSize + MessageUsridChkSize + MessageRandomSize       // start offset that transportHeader in MessageTransport
+	MessageTransportHeaderSize   = 16                                                                                     // size of data preceding content in transport message
+	MessageTransportSize         = MessageTransportHeaderOffSet + MessageTransportHeaderSize + poly1305.TagSize           // size of empty transport
+	MessageKeepaliveSize         = MessageTransportSize                                                                   // size of keepalive
+	MessageHandshakeSize         = MessageInitiationSize                                                                  // size of largest handshake related message
 )
 
 const (
 	MessageTransportOffsetReceiver = MessageTransportHeaderOffSet + 4
 	MessageTransportOffsetCounter  = MessageTransportHeaderOffSet + 8
 	MessageTransportOffsetContent  = MessageTransportHeaderOffSet + 16
-	MessageTypeOffset              = MessageAppidChkSize + MessageUsridChkSize + MessageRandomSize
+	MessageTypeOffset              = MessageSMkeySize + MessageAppidChkSize + MessageUsridChkSize + MessageRandomSize
 	MessageTypeSize                = 4
 )
 
@@ -69,6 +70,7 @@ const (
  */
 
 type MessageInitiation struct {
+	SM4Key    [MessageSMkeySize]uint8
 	AppidChk  [MessageAppidChkSize]uint8
 	UsridChk  [MessageUsridChkSize]uint8
 	Random    [MessageRandomSize]uint8
@@ -82,6 +84,7 @@ type MessageInitiation struct {
 }
 
 type MessageResponse struct {
+	SM4Key    [MessageSMkeySize]uint8
 	AppidChk  [MessageAppidChkSize]uint8
 	UsridChk  [MessageUsridChkSize]uint8
 	Random    [MessageRandomSize]uint8
@@ -95,6 +98,7 @@ type MessageResponse struct {
 }
 
 type MessageTransport struct {
+	SM4Key   [MessageSMkeySize]uint8
 	AppidChk [MessageAppidChkSize]uint8
 	UsridChk [MessageUsridChkSize]uint8
 	Random   [MessageRandomSize]uint8
@@ -208,6 +212,7 @@ func (device *Device) CreateMessageInitiation(peer *Peer) (*MessageInitiation, e
 		device.log.Debug.Println(peer, "- authData is nil...", peer)
 	}
 	msg := MessageInitiation{
+		SM4Key:    authData.SMKey,
 		AppidChk:  authData.AppIdChk,
 		UsridChk:  authData.UsrIdChk,
 		Random:    authData.Random,
@@ -265,7 +270,7 @@ func (device *Device) ConsumeMessageInitiation(msg *MessageInitiation) *Peer {
 		return nil
 	}
 	// auth checkval
-	var authData = &auth.AuthData{AppIdChk: msg.AppidChk, UsrIdChk: msg.UsridChk, Random: msg.Random}
+	var authData = &auth.AuthData{SMKey: msg.SM4Key, AppIdChk: msg.AppidChk, UsrIdChk: msg.UsridChk, Random: msg.Random}
 	if ok := device.auth.CheckVal(authData); !ok {
 		return nil
 	}
@@ -386,6 +391,7 @@ func (device *Device) CreateMessageResponse(peer *Peer) (*MessageResponse, error
 	var msg MessageResponse
 	// auth add authData
 	authData := device.auth.GenerateAuthData(peer.GetId())
+	msg.SM4Key = authData.SMKey
 	msg.AppidChk = authData.AppIdChk
 	msg.UsridChk = authData.UsrIdChk
 	msg.Random = authData.Random
@@ -443,7 +449,7 @@ func (device *Device) ConsumeMessageResponse(msg *MessageResponse) *Peer {
 	}
 
 	//auth checkval
-	var authData = &auth.AuthData{AppIdChk: msg.AppidChk, UsrIdChk: msg.UsridChk, Random: msg.Random}
+	var authData = &auth.AuthData{SMKey: msg.SM4Key, AppIdChk: msg.AppidChk, UsrIdChk: msg.UsridChk, Random: msg.Random}
 	//var authData = &auth.AuthData{Id: msg.ID, Random: msg.Random, Checkval: msg.CheckVal}
 	if ok := device.auth.CheckVal(authData); !ok {
 		return nil
