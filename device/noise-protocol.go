@@ -56,11 +56,12 @@ const (
 )
 
 const (
-	MessageTransportOffsetReceiver = MessageTransportHeaderOffSet + 4
-	MessageTransportOffsetCounter  = MessageTransportHeaderOffSet + 8
-	MessageTransportOffsetContent  = MessageTransportHeaderOffSet + 16
-	MessageTypeOffset              = MessageSMkeySize + MessageAppidChkSize + MessageUsridChkSize + MessageRandomSize
-	MessageTypeSize                = 4
+	MessageTransportOffsetReceiver  = MessageTransportHeaderOffSet + 4
+	MessageTransportOffsetCounter   = MessageTransportHeaderOffSet + 8
+	MessageTransportOffsetTimestamp = MessageTransportHeaderOffSet + 16
+	MessageTransportOffsetContent   = MessageTransportHeaderOffSet + 16 + tai64n.TimestampSize
+	MessageTypeOffset               = MessageSMkeySize + MessageAppidChkSize + MessageUsridChkSize + MessageRandomSize
+	MessageTypeSize                 = 4
 )
 
 /* Type is an 8-bit field, followed by 3 nul bytes,
@@ -98,14 +99,15 @@ type MessageResponse struct {
 }
 
 type MessageTransport struct {
-	SM4Key   [MessageSMkeySize]uint8
-	AppidChk [MessageAppidChkSize]uint8
-	UsridChk [MessageUsridChkSize]uint8
-	Random   [MessageRandomSize]uint8
-	Type     uint32
-	Receiver uint32
-	Counter  uint64
-	Content  []byte
+	SM4Key    [MessageSMkeySize]uint8
+	AppidChk  [MessageAppidChkSize]uint8
+	UsridChk  [MessageUsridChkSize]uint8
+	Random    [MessageRandomSize]uint8
+	Type      uint32
+	Receiver  uint32
+	Counter   uint64
+	TimeStamp [tai64n.TimestampSize]byte
+	Content   []byte
 }
 
 type MessageCookieReply struct {

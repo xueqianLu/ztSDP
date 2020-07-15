@@ -8,6 +8,7 @@ package device
 import (
 	"bytes"
 	"encoding/binary"
+	"github.com/xueqianLu/ztSDP/tai64n"
 	"net"
 	"sync"
 	"sync/atomic"
@@ -501,17 +502,22 @@ func (device *Device) RoutineEncryption() {
 			}
 
 			// populate header fields
+			var _ = MessageTransport{} // Make a mark for MessageTransport create.
 
 			header := elem.buffer[:MessageTransportHeaderOffSet+MessageTransportHeaderSize]
 			audata := device.auth.GenerateAuthData(elem.peer.GetId())
+
 			copy(header[:MessageSMkeySize], audata.SMKey[:])
 			copy(header[MessageSMkeySize:MessageSMkeySize+MessageAppidChkSize], audata.AppIdChk[:])
 			copy(header[MessageSMkeySize+MessageAppidChkSize:MessageSMkeySize+MessageAppidChkSize+MessageUsridChkSize], audata.UsrIdChk[:])
 			copy(header[MessageSMkeySize+MessageAppidChkSize+MessageUsridChkSize:MessageSMkeySize+MessageAppidChkSize+MessageUsridChkSize+MessageRandomSize], audata.Random[:])
 
-			fieldType := header[MessageTransportHeaderOffSet+0 : MessageTransportHeaderOffSet+4]
-			fieldReceiver := header[MessageTransportHeaderOffSet+4 : MessageTransportHeaderOffSet+8]
-			fieldNonce := header[MessageTransportHeaderOffSet+8 : MessageTransportHeaderOffSet+16]
+			fieldType := header[MessageTransportHeaderOffSet : MessageTransportHeaderOffSet+4]
+			fieldReceiver := header[MessageTransportOffsetReceiver : MessageTransportOffsetReceiver+4]
+			fieldNonce := header[MessageTransportOffsetCounter : MessageTransportOffsetContent+8]
+
+			tm := tai64n.Now()
+			copy(header[MessageTransportOffsetTimestamp:MessageTransportOffsetTimestamp+tai64n.TimestampSize], tm[:])
 
 			binary.LittleEndian.PutUint32(fieldType, MessageTransportType)
 			binary.LittleEndian.PutUint32(fieldReceiver, elem.keypair.remoteIndex)
