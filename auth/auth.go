@@ -20,12 +20,6 @@ const (
 
 var iv = []byte{0x13, 0x07, 0x1b, 0x06, 0x11, 0x0a, 0x07, 0x01, 0x01, 0x1c, 0x15, 0x00, 0x1c, 0x1b, 0x19, 0x0a}
 
-func NewAuthorizeWithKey(SM4Key []byte) *Authorize {
-	key := make([]byte, len(SM4Key))
-	copy(key[:], SM4Key[:])
-	return &Authorize{table: &AuthTables{}, SM4Key: key}
-}
-
 func NewAuthorize() *Authorize {
 	return &Authorize{table: &AuthTables{}}
 }
