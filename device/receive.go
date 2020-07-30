@@ -130,6 +130,7 @@ func (device *Device) RoutineReceiveIncoming(IP int, bind Bind) {
 		}
 
 		if size < MinMessageSize {
+			logDebug.Println("Received msg size < minmessagesize")
 			continue
 		}
 

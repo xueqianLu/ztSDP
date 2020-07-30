@@ -59,7 +59,7 @@ const (
 	MessageTransportOffsetReceiver  = MessageTransportHeaderOffSet + 4
 	MessageTransportOffsetCounter   = MessageTransportHeaderOffSet + 8
 	MessageTransportOffsetTimestamp = MessageTransportHeaderOffSet + 16
-	MessageTransportOffsetContent   = MessageTransportHeaderOffSet + 16 + tai64n.TimestampSize
+	MessageTransportOffsetContent   = MessageTransportHeaderOffSet + 16 + 8
 	MessageTypeOffset               = MessageIndexSize + MessageAppidChkSize + MessageUsridChkSize + MessageRandomSize
 	MessageTypeSize                 = 4
 )
@@ -106,7 +106,7 @@ type MessageTransport struct {
 	Type        uint32
 	Receiver    uint32
 	Counter     uint64
-	TimeStamp   [tai64n.TimestampSize]byte
+	TimeStamp   uint64
 	Content     []byte
 }
 
