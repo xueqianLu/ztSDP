@@ -177,15 +177,6 @@ func (device *Device) IpcSetOperation(socket *bufio.Reader) *IPCError {
 					logError.Println("Failed to set listen_port:", err)
 					return &IPCError{ipc.IpcErrorPortInUse}
 				}
-			case "smkey":
-				key, err := hex.DecodeString(value)
-				if err != nil {
-					logError.Println("decode smkey failed:", err)
-					return &IPCError{ipc.IpcErrorInvalid}
-				}
-				device.auth.SM4Key = key
-				logDebug.Println("set smkey", value)
-
 			case "fwmark":
 
 				// parse fwmark field
@@ -281,6 +272,14 @@ func (device *Device) IpcSetOperation(socket *bufio.Reader) *IPCError {
 				} else {
 					logError.Println("peer is nil when set peerid.")
 				}
+			case "smkey":
+				key, err := hex.DecodeString(value)
+				if err != nil {
+					logError.Println("decode smkey failed:", err)
+					return &IPCError{ipc.IpcErrorInvalid}
+				}
+				device.auth.SM4Key = key
+				logDebug.Println("set smkey", value)
 
 			case "update_only":
 
