@@ -62,6 +62,11 @@ func (device *Device) IpcGetOperation(socket *bufio.Writer) *IPCError {
 			send(fmt.Sprintf("listen_port=%d", device.net.port))
 		}
 
+		if device.auth.SM4Key != nil {
+			key := hex.EncodeToString(device.auth.SM4Key)
+			send(fmt.Sprintf("smkey=%s", key))
+		}
+
 		if device.net.fwmark != 0 {
 			send(fmt.Sprintf("fwmark=%d", device.net.fwmark))
 		}
