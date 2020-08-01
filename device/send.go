@@ -8,7 +8,6 @@ package device
 import (
 	"bytes"
 	"encoding/binary"
-	"github.com/xueqianLu/ztSDP/tai64n"
 	"net"
 	"sync"
 	"sync/atomic"
@@ -515,9 +514,11 @@ func (device *Device) RoutineEncryption() {
 			fieldType := header[MessageTransportHeaderOffSet : MessageTransportHeaderOffSet+4]
 			fieldReceiver := header[MessageTransportOffsetReceiver : MessageTransportOffsetReceiver+4]
 
-			tm := tai64n.Now()
-			copy(header[MessageTransportOffsetTimestamp:MessageTransportOffsetTimestamp+8], tm[:8])
-			logDebug.Println("get timestamp ", binary.BigEndian.Uint64(tm[:8]))
+			tm := uint64(time.Now().Unix())
+			//copy(header[MessageTransportOffsetTimestamp:MessageTransportOffsetTimestamp+8], tm[:8])
+			fieldTime := header[MessageTransportOffsetTimestamp : MessageTransportOffsetTimestamp+8]
+			binary.BigEndian.PutUint64(fieldTime, tm)
+			logDebug.Println("get timestamp ", binary.BigEndian.Uint64(fieldTime))
 
 			fieldNonce := header[MessageTransportOffsetCounter : MessageTransportOffsetCounter+8]
 
@@ -547,7 +548,7 @@ func (device *Device) RoutineEncryption() {
 				elem.packet,
 				nil,
 			)
-			elem.packet = append(header, elem.packet...)
+			//elem.packet = append(header, elem.packet...)
 			elem.Unlock()
 		}
 	}

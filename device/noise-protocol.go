@@ -58,7 +58,7 @@ const (
 const (
 	MessageTransportOffsetReceiver  = MessageTransportHeaderOffSet + 4
 	MessageTransportOffsetTimestamp = MessageTransportHeaderOffSet + 8
-	MessageTransportOffsetCounter   = MessageTransportHeaderOffSet + 16
+	MessageTransportOffsetCounter   = MessageTransportHeaderOffSet + 8 + 8
 	MessageTransportOffsetContent   = MessageTransportHeaderOffSet + 16 + 8
 	MessageTypeOffset               = MessageIndexSize + MessageAppidChkSize + MessageUsridChkSize + MessageRandomSize
 	MessageTypeSize                 = 4
