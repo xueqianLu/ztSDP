@@ -49,7 +49,7 @@ const (
 	MessageResponseSize          = 92 + MessageIndexSize + MessageAppidChkSize + MessageUsridChkSize + MessageRandomSize  // size of response message
 	MessageCookieReplySize       = 64                                                                                     // size of cookie reply message
 	MessageTransportHeaderOffSet = MessageIndexSize + MessageAppidChkSize + MessageUsridChkSize + MessageRandomSize       // start offset that transportHeader in MessageTransport
-	MessageTransportHeaderSize   = 16                                                                                     // size of data preceding content in transport message
+	MessageTransportHeaderSize   = 24                                                                                     // size of data preceding content in transport message
 	MessageTransportSize         = MessageTransportHeaderOffSet + MessageTransportHeaderSize + poly1305.TagSize           // size of empty transport
 	MessageKeepaliveSize         = MessageTransportSize                                                                   // size of keepalive
 	MessageHandshakeSize         = MessageInitiationSize                                                                  // size of largest handshake related message
@@ -57,8 +57,8 @@ const (
 
 const (
 	MessageTransportOffsetReceiver  = MessageTransportHeaderOffSet + 4
-	MessageTransportOffsetCounter   = MessageTransportHeaderOffSet + 8
-	MessageTransportOffsetTimestamp = MessageTransportHeaderOffSet + 16
+	MessageTransportOffsetTimestamp = MessageTransportHeaderOffSet + 8
+	MessageTransportOffsetCounter   = MessageTransportHeaderOffSet + 16
 	MessageTransportOffsetContent   = MessageTransportHeaderOffSet + 16 + 8
 	MessageTypeOffset               = MessageIndexSize + MessageAppidChkSize + MessageUsridChkSize + MessageRandomSize
 	MessageTypeSize                 = 4
@@ -105,8 +105,8 @@ type MessageTransport struct {
 	Random      [MessageRandomSize]uint8
 	Type        uint32
 	Receiver    uint32
-	Counter     uint64
 	TimeStamp   uint64
+	Counter     uint64
 	Content     []byte
 }
 

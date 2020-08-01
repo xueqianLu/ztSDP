@@ -8,6 +8,7 @@ package device
 import (
 	"bytes"
 	"encoding/binary"
+	"github.com/xueqianLu/ztSDP/tai64n"
 	"net"
 	"sync"
 	"sync/atomic"
@@ -513,11 +514,12 @@ func (device *Device) RoutineEncryption() {
 
 			fieldType := header[MessageTransportHeaderOffSet : MessageTransportHeaderOffSet+4]
 			fieldReceiver := header[MessageTransportOffsetReceiver : MessageTransportOffsetReceiver+4]
-			fieldNonce := header[MessageTransportOffsetCounter : MessageTransportOffsetContent+8]
 
-			fieldTime := header[MessageTransportOffsetTimestamp : MessageTransportOffsetTimestamp+8]
-			tm := time.Now().Unix()
-			binary.LittleEndian.PutUint64(fieldTime, uint64(tm))
+			tm := tai64n.Now()
+			copy(header[MessageTransportOffsetTimestamp:MessageTransportOffsetTimestamp+8], tm[:8])
+			logDebug.Println("get timestamp ", binary.BigEndian.Uint64(tm[:8]))
+
+			fieldNonce := header[MessageTransportOffsetCounter : MessageTransportOffsetCounter+8]
 
 			binary.LittleEndian.PutUint32(fieldType, MessageTransportType)
 			binary.LittleEndian.PutUint32(fieldReceiver, elem.keypair.remoteIndex)
@@ -538,12 +540,14 @@ func (device *Device) RoutineEncryption() {
 			// encrypt content and release to consumer
 
 			binary.LittleEndian.PutUint64(nonce[4:], elem.nonce)
+			// Todo: remove wg encrypt.
 			elem.packet = elem.keypair.send.Seal(
 				header,
 				nonce[:],
 				elem.packet,
 				nil,
 			)
+			elem.packet = append(header, elem.packet...)
 			elem.Unlock()
 		}
 	}

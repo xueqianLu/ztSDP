@@ -80,10 +80,11 @@ func (this Authorize) EncPacket(data []byte) []byte {
 	return ret
 }
 
-func (this Authorize) DecPacket(packet []byte) []byte {
+func (this Authorize) DecPacket(packet []byte) ([]byte, int) {
 	key := this.SM4Key
 	decdata := SM4DecryptCBC(key[:], packet[EncOffset:])
+	copy(packet[EncOffset:EncOffset+len(decdata)], decdata)
 
-	ret := BytesCombine(packet[:EncOffset], decdata)
-	return ret
+	//ret := BytesCombine(packet[:EncOffset], decdata)
+	return packet, EncOffset + len(decdata)
 }

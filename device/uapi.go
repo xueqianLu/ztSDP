@@ -62,11 +62,6 @@ func (device *Device) IpcGetOperation(socket *bufio.Writer) *IPCError {
 			send(fmt.Sprintf("listen_port=%d", device.net.port))
 		}
 
-		if device.auth.SM4Key != nil {
-			key := hex.EncodeToString(device.auth.SM4Key)
-			send(fmt.Sprintf("smkey=%s", key))
-		}
-
 		if device.net.fwmark != 0 {
 			send(fmt.Sprintf("fwmark=%d", device.net.fwmark))
 		}
@@ -94,6 +89,10 @@ func (device *Device) IpcGetOperation(socket *bufio.Writer) *IPCError {
 			send(fmt.Sprintf("rx_bytes=%d", atomic.LoadUint64(&peer.stats.rxBytes)))
 			send(fmt.Sprintf("persistent_keepalive_interval=%d", peer.persistentKeepaliveInterval))
 			send(fmt.Sprintf("id=%s", string(peer.id[:])))
+			if device.auth.SM4Key != nil {
+				key := hex.EncodeToString(device.auth.SM4Key)
+				send(fmt.Sprintf("smkey=%s", key))
+			}
 
 			for _, ip := range device.allowedips.EntriesForPeer(peer) {
 				send("allowed_ip=" + ip.String())
