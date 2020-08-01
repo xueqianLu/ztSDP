@@ -526,29 +526,21 @@ func (device *Device) RoutineEncryption() {
 			binary.LittleEndian.PutUint32(fieldReceiver, elem.keypair.remoteIndex)
 			binary.LittleEndian.PutUint64(fieldNonce, elem.nonce)
 
-			// pad content to multiple of 16
-
-			mtu := int(atomic.LoadInt32(&device.tun.mtu))
-			lastUnit := len(elem.packet) % mtu
-			paddedSize := (lastUnit + PaddingMultiple - 1) & ^(PaddingMultiple - 1)
-			if paddedSize > mtu {
-				paddedSize = mtu
-			}
-			for i := len(elem.packet); i < paddedSize; i++ {
-				elem.packet = append(elem.packet, 0)
-			}
-
 			// encrypt content and release to consumer
-
 			binary.LittleEndian.PutUint64(nonce[4:], elem.nonce)
 			// Todo: remove wg encrypt.
-			elem.packet = elem.keypair.send.Seal(
-				header,
-				nonce[:],
-				elem.packet,
-				nil,
-			)
-			//elem.packet = append(header, elem.packet...)
+			//elem.packet = elem.keypair.send.Seal(
+			//	header,
+			//	nonce[:],
+			//	elem.packet,
+			//	nil,
+			//)
+			sendpacket := make([]byte, len(header)+len(elem.packet))
+			copy(sendpacket[:len(header)], header[:])
+			copy(sendpacket[len(header):], elem.packet)
+			elem.packet = sendpacket
+			//elem.packet = elem.buffer[:len(header)+len(elem.packet)]
+
 			elem.Unlock()
 		}
 	}

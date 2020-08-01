@@ -288,14 +288,14 @@ func (device *Device) RoutineDecryption() {
 			var err error
 			elem.counter = binary.LittleEndian.Uint64(counter)
 			// Todo: remove wg decrypt.
-			elem.packet, err = elem.keypair.receive.Open(
-				content[:0],
-				nonce[:],
-				content,
-				nil,
-			)
+			//elem.packet, err = elem.keypair.receive.Open(
+			//	content[:0],
+			//	nonce[:],
+			//	content,
+			//	nil,
+			//)
 
-			//elem.packet = content
+			elem.packet = content
 			if err != nil {
 				logDebug.Println("ztSDP receive: decrypt routine decrypt failed, err ", err)
 				elem.Drop()
