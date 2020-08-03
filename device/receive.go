@@ -8,7 +8,6 @@ package device
 import (
 	"bytes"
 	"encoding/binary"
-	"encoding/hex"
 	"net"
 	"strconv"
 	"sync"
@@ -134,15 +133,12 @@ func (device *Device) RoutineReceiveIncoming(IP int, bind Bind) {
 			logDebug.Println("Received msg size < minmessagesize")
 			continue
 		}
-		logDebug.Println("Receive packet before dec ", hex.EncodeToString(buffer[:size]))
 		_, size = device.auth.DecPacket(buffer[:size])
 		packet := buffer[:size]
-		logDebug.Println("Receive packet after dec size ", size, ",data ", hex.EncodeToString(packet))
 
 		// check size of packet
 
 		msgType := binary.LittleEndian.Uint32(packet[MessageTypeOffset : MessageTypeOffset+MessageTypeSize])
-		logDebug.Println("Receive MessageType ", msgType)
 
 		var okay bool
 
@@ -153,9 +149,9 @@ func (device *Device) RoutineReceiveIncoming(IP int, bind Bind) {
 		case MessageTransportType:
 
 			// check size
-			logDebug.Println("ztsdp receive:MessageTransportType, len(packet) ", len(packet))
+			//logDebug.Println("ztsdp receive:MessageTransportType, len(packet) ", len(packet))
 			if len(packet) < MessageTransportSize {
-				logDebug.Println("ztsdp receive:packet length < MessageTransportsize", len(packet), MessageTransportSize)
+				//logDebug.Println("ztsdp receive:packet length < MessageTransportsize", len(packet), MessageTransportSize)
 				continue
 			}
 
@@ -167,17 +163,17 @@ func (device *Device) RoutineReceiveIncoming(IP int, bind Bind) {
 			value := device.indexTable.Lookup(receiver)
 			keypair := value.keypair
 			if keypair == nil {
-				logDebug.Println("ztsdp receive: receiver keypair is null, exit ")
+				//logDebug.Println("ztsdp receive: receiver keypair is null, exit ")
 				continue
 			}
 
 			// check keypair expiry
 
 			if keypair.created.Add(RejectAfterTime).Before(time.Now()) {
-				logDebug.Println("ztsdp receive: receiver keypair expiry, exit ")
+				//logDebug.Println("ztsdp receive: receiver keypair expiry, exit ")
 				continue
 			}
-			logDebug.Println("ztsdp receive: packet check passed ,continue.")
+			//logDebug.Println("ztsdp receive: packet check passed ,continue.")
 
 			// create work element
 			peer := value.peer
@@ -195,13 +191,9 @@ func (device *Device) RoutineReceiveIncoming(IP int, bind Bind) {
 
 			if peer.isRunning.Get() {
 				if device.addToInboundAndDecryptionQueues(peer.queue.inbound, device.queue.decryption, elem) {
-					logDebug.Println("ztSDP receive: peer is running and inbound success")
+					//logDebug.Println("ztSDP receive: peer is running and inbound success")
 					buffer = device.GetMessageBuffer()
-				} else {
-					logDebug.Println("ztSDP receive: peer is running but inbound and decry failed")
 				}
-			} else {
-				logDebug.Println("ztSDP receive: peer is not running, droped packet")
 			}
 
 			continue
@@ -220,7 +212,7 @@ func (device *Device) RoutineReceiveIncoming(IP int, bind Bind) {
 		default:
 			logDebug.Println("Received message with unknown type")
 		}
-		logDebug.Println("Receive Message , the message is okay ? ", okay)
+
 		if okay {
 			if (device.addToHandshakeQueue(
 				device.queue.handshake,
@@ -297,11 +289,11 @@ func (device *Device) RoutineDecryption() {
 
 			elem.packet = content
 			if err != nil {
-				logDebug.Println("ztSDP receive: decrypt routine decrypt failed, err ", err)
+				//logDebug.Println("ztSDP receive: decrypt routine decrypt failed, err ", err)
 				elem.Drop()
 				device.PutMessageBuffer(elem.buffer)
 			} else {
-				logDebug.Println("ztSDP receive: decrypt routine decrypt success")
+				//logDebug.Println("ztSDP receive: decrypt routine decrypt success")
 			}
 			elem.Unlock()
 		}

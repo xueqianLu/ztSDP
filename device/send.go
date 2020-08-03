@@ -518,7 +518,6 @@ func (device *Device) RoutineEncryption() {
 			//copy(header[MessageTransportOffsetTimestamp:MessageTransportOffsetTimestamp+8], tm[:8])
 			fieldTime := header[MessageTransportOffsetTimestamp : MessageTransportOffsetTimestamp+8]
 			binary.BigEndian.PutUint64(fieldTime, tm)
-			logDebug.Println("get timestamp ", binary.BigEndian.Uint64(fieldTime))
 
 			fieldNonce := header[MessageTransportOffsetCounter : MessageTransportOffsetCounter+8]
 
