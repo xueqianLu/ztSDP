@@ -8,9 +8,8 @@ package ipc
 import (
 	"net"
 
+	"github.com/xueqianLu/ztSDP/ipc/namedpipe"
 	"golang.org/x/sys/windows"
-
-	"github.com/xueqianLu/ztSDP/ipc/winpipe"
 )
 
 // TODO: replace these with actual standard windows error numbers from the win package
@@ -19,6 +18,7 @@ const (
 	IpcErrorProtocol  = -int64(71)
 	IpcErrorInvalid   = -int64(22)
 	IpcErrorPortInUse = -int64(98)
+	IpcErrorUnknown   = -int64(55)
 )
 
 type UAPIListener struct {
@@ -53,18 +53,16 @@ var UAPISecurityDescriptor *windows.SECURITY_DESCRIPTOR
 
 func init() {
 	var err error
-	/* SDDL_DEVOBJ_SYS_ALL from the WDK */
-	UAPISecurityDescriptor, err = windows.SecurityDescriptorFromString("O:SYD:P(A;;GA;;;SY)")
+	UAPISecurityDescriptor, err = windows.SecurityDescriptorFromString("O:SYD:P(A;;GA;;;SY)(A;;GA;;;BA)S:(ML;;NWNRNX;;;HI)")
 	if err != nil {
 		panic(err)
 	}
 }
 
 func UAPIListen(name string) (net.Listener, error) {
-	config := winpipe.PipeConfig{
+	listener, err := (&namedpipe.ListenConfig{
 		SecurityDescriptor: UAPISecurityDescriptor,
-	}
-	listener, err := winpipe.ListenPipe(`\\.\pipe\ProtectedPrefix\Administrators\ZtA\`+name, &config)
+	}).Listen(`\\.\pipe\ProtectedPrefix\Administrators\ZtA\` + name)
 	if err != nil {
 		return nil, err
 	}

@@ -1,31 +1,19 @@
-// +build darwin freebsd openbsd
+//go:build darwin || freebsd || openbsd
 
 /* SPDX-License-Identifier: MIT
  *
- * Copyright (C) 2017-2019 ZtSDP LLC. All Rights Reserved.
+ * Copyright (C) 2017-2021 WireGuard LLC. All Rights Reserved.
  */
 
 package ipc
 
 import (
 	"errors"
-	"fmt"
 	"net"
 	"os"
-	"path"
 	"unsafe"
 
 	"golang.org/x/sys/unix"
-)
-
-var socketDirectory = "/var/run/ztSDP"
-
-const (
-	IpcErrorIO        = -int64(unix.EIO)
-	IpcErrorProtocol  = -int64(unix.EPROTO)
-	IpcErrorInvalid   = -int64(unix.EINVAL)
-	IpcErrorPortInUse = -int64(unix.EADDRINUSE)
-	socketName        = "%s.sock"
 )
 
 type UAPIListener struct {
@@ -66,7 +54,6 @@ func (l *UAPIListener) Addr() net.Addr {
 }
 
 func UAPIListen(name string, file *os.File) (net.Listener, error) {
-
 	// wrap file in listener
 
 	listener, err := net.FileListener(file)
@@ -84,10 +71,7 @@ func UAPIListen(name string, file *os.File) (net.Listener, error) {
 		unixListener.SetUnlinkOnClose(true)
 	}
 
-	socketPath := path.Join(
-		socketDirectory,
-		fmt.Sprintf(socketName, name),
-	)
+	socketPath := sockPath(name)
 
 	// watch for deletion of socket
 
@@ -119,7 +103,7 @@ func UAPIListen(name string, file *os.File) (net.Listener, error) {
 				l.connErr <- err
 				return
 			}
-			if kerr != nil || n != 1 {
+			if (kerr != nil || n != 1) && kerr != unix.EINTR {
 				if kerr != nil {
 					l.connErr <- kerr
 				} else {
@@ -145,59 +129,4 @@ func UAPIListen(name string, file *os.File) (net.Listener, error) {
 	}(uapi)
 
 	return uapi, nil
-}
-
-func UAPIOpen(name string) (*os.File, error) {
-
-	// check if path exist
-
-	err := os.MkdirAll(socketDirectory, 0755)
-	if err != nil && !os.IsExist(err) {
-		return nil, err
-	}
-
-	// open UNIX socket
-
-	socketPath := path.Join(
-		socketDirectory,
-		fmt.Sprintf(socketName, name),
-	)
-
-	addr, err := net.ResolveUnixAddr("unix", socketPath)
-	if err != nil {
-		return nil, err
-	}
-
-	oldUmask := unix.Umask(0077)
-	listener, err := func() (*net.UnixListener, error) {
-
-		// initial connection attempt
-
-		listener, err := net.ListenUnix("unix", addr)
-		if err == nil {
-			return listener, nil
-		}
-
-		// check if socket already active
-
-		_, err = net.Dial("unix", socketPath)
-		if err == nil {
-			return nil, errors.New("unix socket in use")
-		}
-
-		// cleanup & attempt again
-
-		err = os.Remove(socketPath)
-		if err != nil {
-			return nil, err
-		}
-		return net.ListenUnix("unix", addr)
-	}()
-	unix.Umask(oldUmask)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return listener.File()
 }
