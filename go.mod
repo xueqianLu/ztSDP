@@ -4,8 +4,8 @@ go 1.13
 
 require (
 	github.com/tjfoc/gmsm v1.3.2
-	golang.org/x/crypto v0.0.0-20191227163750-53104e6ec876
-	golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553
-	golang.org/x/sys v0.0.0-20200106162015-b016eb3dc98e
-	golang.org/x/text v0.3.0
+	golang.org/x/crypto v0.0.0-20211108221036-ceb1ce70b4fa
+	golang.org/x/net v0.0.0-20211111083644-e5c967477495
+	golang.org/x/sys v0.0.0-20211110154304-99a53858aa08
+	golang.org/x/text v0.3.6
 )

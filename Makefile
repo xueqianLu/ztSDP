@@ -16,8 +16,10 @@ generate-version-and-build:
 ztSDP: $(wildcard *.go) $(wildcard */*.go)
 	go build -v -o "$@"
 
+test:
+	go test ./...
 
 clean:
 	rm -f ztSDP
 
-.PHONY: all clean generate-version-and-build
+.PHONY: all clean test generate-version-and-build
